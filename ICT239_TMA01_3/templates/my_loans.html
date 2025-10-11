@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}My Loans - SG Library{% endblock %}
+
+{% block content %}
+
+{# CRITICAL FIX: Wrap the header and the card in a single block for better width control #}
+<div class="loan-page-wrapper">
+
+    {# 1. The Header is now controlled by the wrapper #}
+    <h2 class="page-header">My Loans</h2>
+
+    {# 2. The Content Card #}
+    <div class="container loan-page-container">
+
+    {# Display Flash Messages (Success/Error) #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {# FIX: Only display the table if there are loans. #}
+    {% if loans %}
+
+    <table class="loans-table">
+        <thead>
+            <tr>
+                <th>Title/Author</th>
+                <th>Due Date</th>
+                <th>Renew Count Left</th> 
+                <th>Return Date / Status</th> 
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for loan in loans %}
+            <tr>
+                {# ------------------------------------------------------------- #}
+                {# --- FIX: Title/Author column structure added here --- #}
+                {# ------------------------------------------------------------- #}
+                <td>
+                    <img src="{{ loan.book_image_url }}" alt="Cover of {{ loan.book_title }}" class="loan-thumbnail">
+                    
+                    <span class="loan-title">{{ loan.book_title }}</span>
+                    
+                    <span class="loan-author">By {{ loan.book_author }}</span>
+                </td>
+                
+                <td class="{% if loan.is_overdue %}overdue{% endif %}">{{ loan.due_date_formatted }}</td>
+                
+                {# RENEW COUNT COLUMN #}
+                <td>
+                    {% if loan.is_active %}
+                        <span class="renew-count-text">{{ 2 - loan.renew_count }} left</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                
+                {# RETURN DATE / STATUS COLUMN #}
+                <td>
+                    {% if loan.is_active %}
+                        <span class="status-active">Active</span>
+                        {% if loan.is_overdue %}
+                            <span class="status-overdue"> (OVERDUE)</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="status-returned">Returned on {{ loan.return_date_formatted }}</span>
+                    {% endif %}
+                </td>
+                
+                {# ACTION COLUMN (Buttons) #}
+                <td>
+                    {% if loan.is_active %}
+                        <form method="POST" action="{{ url_for('return_loan', loan_id=loan.id) }}" style="display: inline;">
+                            {% if csrf_token %}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            {% endif %}
+                            <button type="submit" class="btn return-btn">Return</button>
+                        </form>
+                        
+                        {% if loan.can_renew %}
+                            <a href="{{ url_for('renew_loan', loan_id=loan.id) }}" class="btn renew-btn">Renew</a>
+                        {% else %}
+                            <span class="btn renew-btn disabled">Renew Limit</span>
+                        {% endif %}
+                    {% else %}
+                        <form method="POST" action="{{ url_for('delete_loan', loan_id=loan.id) }}" style="display: inline;">
+                            {% if csrf_token %}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            {% endif %}
+                            <button type="submit" class="btn delete-btn">Delete Record</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        {# Display this simple message when no loans exist, avoiding the empty table headers #}
+        <p class="text-xl text-center py-10 font-medium text-gray-600">No Loan Currently</p>
+    {% endif %}
+
+    </div> 
+</div>
+{% endblock content %}

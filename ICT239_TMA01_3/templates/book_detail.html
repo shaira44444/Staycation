@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}SG Library - {{ book.title }}{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper">
+        
+        <div class="header-banner">
+            <h1 class="book-details-heading">BOOK DETAILS</h1>
+        </div>
+
+        <div class="detail-card">
+            <div class="cover-section">
+                <img src="{{ url_for('static', filename='images/' ~ book.image_file) }}" alt="{{ book.title }} Cover" class="detail-cover">
+            </div>
+            
+            <div class="info-section">
+                <h2 class="detail-title">{{ book.title }}</h2> 
+                
+                <p class="detail-author">By {{ book.author }}</p>
+                
+                <div class="detail-metadata">
+                    <p class="detail-metadata-line">Category: {{ book.category }}, {{ book.genres }}</p>
+                    <p class="detail-metadata-line">Pages: {{ book.pages }}</p>
+                    <p class="detail-metadata-line">Copies: {{ book.copies }} Available: {{ book.available }}</p>
+                </div>
+                
+                {% for paragraph in book.description_paragraphs %}
+                    <p class="full-description-para">{{ paragraph }}</p>
+                {% endfor %}
+
+                <!-- START: Conditional Action Bar (fulfills Q3(b)(ii)) -->
+                <!-- Uses inline style to ensure right alignment and side-by-side display, as requested previously -->
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 20px;">
+                    <!-- Back to Book Titles is ALWAYS present -->
+                    <a href="{{ url_for('books_titles') }}" class="back-button">Back to Book Titles</a>
+                    
+                    {% if book.available > 0 %}
+                        <!-- If available > 0, show the "Make a loan" button -->
+                        <!-- Uses inline style for a distinct color for the loan button -->
+                        <a href="{{ url_for('make_loan', book_id=book.id) }}" class="back-button" style="background-color: #4CAF50;">Make a loan</a>
+                    {% else %}
+                        <!-- If available = 0, show the "Not available" status in red -->
+                        <span style="color: white; background-color: #EF4444; padding: 10px 20px; border-radius: 4px; font-weight: bold; white-space: nowrap; align-self: flex-end">Not available</span>
+                    {% endif %}
+                </div>
+                <!-- END: Conditional Action Bar -->
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

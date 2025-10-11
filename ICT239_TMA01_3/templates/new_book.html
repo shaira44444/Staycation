@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Book - SG Library{% endblock %}
+
+{% block content %}
+<div class="container form-page-container">
+    <h2 class="page-header">ADD A BOOK</h2>
+    
+    {# Display Flash Messages (Success/Error) #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('new_book') }}" class="book-form">
+        {{ form.hidden_tag() }} 
+
+        <fieldset class="form-section">
+            
+            {# 1. Genres (Horizontal Layout) #}
+            <div class="form-group"> 
+                {{ form.genres.label(class="form-label", text="Choose multiple Genres:") }}
+                {{ form.genres(class="form-control multi-select", size=8) }} 
+                {% for error in form.genres.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {# 2. Title (Horizontal) #}
+            <div class="form-group">
+                {{ form.title.label(class="form-label required") }}
+                {{ form.title(class="form-control") }}
+                {% for error in form.title.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {# 3. Category (Horizontal - Manual Field) #}
+            <div class="form-group">
+                <label for="category_select" class="form-label">Choose a category:</label>
+                <select id="category_select" name="category_select" class="form-control">
+                    <option value="Children">Children</option>
+                    <option value="Fiction">Fiction</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Science">Science</option>
+                </select>
+            </div>
+
+            {# 4. Cover Image URL (Horizontal) #}
+            <div class="form-group">
+                {{ form.cover_image.label(class="form-label required", text="URL for Cover:") }}
+                {{ form.cover_image(class="form-control") }}
+                {% for error in form.cover_image.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {# 5. Description (Horizontal Layout) #}
+            <div class="form-group"> 
+                {{ form.description.label(class="form-label required") }}
+                {{ form.description(class="form-control", rows=6) }}
+                {% for error in form.description.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+        </fieldset>
+
+        {# Field Set 2: Authors (Horizontal Fields) #}
+        <fieldset class="form-section">
+            <legend>Book Authors</legend>
+            
+            {% for author_field in form.authors_text %}
+            <div class="form-group author-entry">
+                <!-- CRITICAL FIX: Include hidden tag for the sub-form entry -->
+                {{ author_field.hidden_tag() }}
+                <label class="form-label required" for="{{ author_field.author_name.id }}">Author {{ loop.index }}:</label>
+                {{ author_field.author_name(class="form-control") }}
+                {% for error in author_field.author_name.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            
+            <div class="form-group full-width-input author-add-button">
+                <button type="submit" name="add_author" class="btn btn-add-author">
+                    + Add Another Author
+                </button>
+            </div>
+        </fieldset>
+
+        {# Field Set 3: Pages and Copies (Horizontal Fields) #}
+        <fieldset class="form-section">
+            
+            {# 6. Number of pages (Horizontal) #}
+            <div class="form-group">
+                {{ form.page_count.label(class="form-label", text="Number of pages:") }}
+                {{ form.page_count(class="form-control") }}
+                {% for error in form.page_count.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            {# 7. Number of copies (Horizontal - Manual Field) #}
+            <div class="form-group">
+                <label for="copies" class="form-label">Number of copies:</label>
+                <input type="number" id="copies" name="copies" class="form-control" value="1" min="1">
+            </div>
+        </fieldset>
+
+        <div class="form-group submit-group">
+            {{ form.submit(class="btn btn-success btn-large") }} 
+        </div>
+    </form>
+</div>
+{% endblock content %}

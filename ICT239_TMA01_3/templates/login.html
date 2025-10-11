@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}SG Library - Login{% endblock %}
+
+{% block content %}
+
+<div class="content-wrapper">
+
+{# Header uses .header-banner and .page-heading for the gradient bar look #}
+
+<div class="header-banner">
+<h1 class="page-heading">LOGIN</h1>
+</div>
+
+{# The card container is .form-container, styled to be the white box #}
+
+<div class="form-container">
+<h2 class="form-title">Login</h2>
+
+{# Flask flash messages for success/error alerts #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash-message alert-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('login') }}" class="auth-form">
+    
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="Enter email" required>
+    
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Enter password" required>
+    
+    {# Added the Remember Me checkbox #}
+    <div class="remember-me-group">
+        <input type="checkbox" id="remember_me" name="remember" value="true">
+        <label for="remember_me">Remember Me</label>
+    </div>
+    
+    {# Submit button uses .submit-button.green to be green and float right #}
+    <button type="submit" class="submit-button green">Submit</button>
+    
+    {# Element to clear the float from the submit button (optional but good practice) #}
+    <div style="clear: both;"></div>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

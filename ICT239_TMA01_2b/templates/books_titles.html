@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}SG Library - Book Titles{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper">
+        <div class="header-banner">
+            <h1 class="book-titles-heading">BOOK TITLES</h1>
+        </div>
+
+        <div class="search-bar">
+            <div class="title-count">Number of titles: <span>{{ num_titles }}</span></div>
+            <form method="POST" action="{{ url_for('books_titles') }}" class="search-form">
+                <label for="category_select">Category:</label>
+                <select id="category_select" name="category_select">
+                    {% for category in categories %}
+                        <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+
+        <div class="book-list">
+            {% for book in books %}
+            <div class="book-card">
+                <div class="book-cover-container">
+                    <img src="{{ url_for('static', filename='images/' ~ book.image_file) }}" alt="{{ book.title }} Cover" class="book-cover">
+                </div>
+                <div class="book-info">
+                    <h2>{{ book.title }}</h2>
+                    <p class="author-info">By {{ book.author }}</p>
+                    <p class="metadata">
+                        Category: {{ book.category }},
+                        {{ book.genres }}<br>
+                        Pages: {{ book.pages }}
+                    </p>
+                    <p class="description-para">{{ book.first_para }}</p>
+                    {% if book.last_para %}
+                        <p class="description-para">{{ book.last_para }}</p>
+                    {% endif %}
+
+                    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="more-details-button">
+                        More details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div> {% endblock %}
